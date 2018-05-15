@@ -10,9 +10,17 @@ DarkUnica(ReactHighstock.Highcharts)
 export default class Chart extends Component {
     constructor(props) {
         super(props);
-        this.state = {candles: [], volumes: []}
-        Meteor.call("getData", "BTCUSD", "1h", (error, result) => {
-            this.setState({candles: result.candles, volumes: result.volumes})
+        this.state = {candles: [], volumes: [], selected: 3}
+    }
+
+    componentDidMount() {
+        this.getData("BTCUSD", "1h")
+    }
+
+    getData(symbol, timeFrame, selected = this.state.selected) {
+        this.refs.chart.getChart().showLoading()
+        Meteor.call("getData", symbol, timeFrame, (error, result) => {
+            this.setState({candles: result.candles, volumes: result.volumes, selected: selected})
         })
     }
 
@@ -21,56 +29,70 @@ export default class Chart extends Component {
             series: [{
                 type: 'candlestick',
                 name: 'BTCUSD',
-                data: this.state.candles/*,
-                dataGrouping: {
-                    units: [[
-                        'week',                         // unit name
-                        [1]                             // allowed multiples
-                    ], [
-                        'month',
-                        [1, 2, 3, 4, 6]
-                    ]]
-                }*/
+                data: this.state.candles
             }, {
                 type: 'column',
                 name: 'Volume',
                 data: this.state.volumes,
-                yAxis: 1/*,
-                dataGrouping: {
-                    units: [[
-                        'week',                         // unit name
-                        [1]                             // allowed multiples
-                    ], [
-                        'month',
-                        [1, 2, 3, 4, 6]
-                    ]]
-                }
-                */
+                yAxis: 1
             }],
             rangeSelector: {
-                //selected: 1
+                selected: this.state.selected,
+                allButtonsEnabled: true,
                 buttons: [{
-                    type: 'minute',
-                    count: 1,
-                    text: '1m'
-                }, {
-                    type: 'minute',
-                    count: 5,
-                    text: '5m'
-                }, {
-                    type: 'minute',
-                    count: 30,
-                    text: '30m'
+                    type: 'hour',
+                    count: 3,
+                    text: '1m',
+                    events: {
+                        click: () => {
+                            this.getData("BTCUSD", "1m", 0)
+                        }
+                    }
                 }, {
                     type: 'hour',
-                    text: 'YTD'
+                    count: 10,
+                    text: '5m',
+                    events: {
+                        click: () => {
+                            this.getData("BTCUSD", "5m", 1)
+                        }
+                    }
                 }, {
-                    type: 'hour',
+                    type: 'day',
+                    count: 2,
+                    text: '30m',
+                    events: {
+                        click: () => {
+                            this.getData("BTCUSD", "30m", 2)
+                        }
+                    }
+                }, {
+                    type: 'week',
                     count: 1,
-                    text: '1y'
+                    text: '1h',
+                    events: {
+                        click: () => {
+                            this.getData("BTCUSD", "1h", 3)
+                        }
+                    }
                 }, {
-                    type: 'all',
-                    text: 'All'
+                    type: 'week',
+                    count: 4,
+                    text: '6h',
+                    events: {
+                        click: () => {
+                            this.getData("BTCUSD", "6h", 4)
+                        }
+                    }
+                }, {
+                    type: 'year',
+                    count: 1,
+                    text: '1d',
+                    events: {
+                        click: () => {
+                            this.getData("BTCUSD", "1D", 5)
+                        }
+                    }
                 }]
             },
             title: {
@@ -84,7 +106,7 @@ export default class Chart extends Component {
                 title: {
                     text: 'OHLC'
                 },
-                height: '60%',
+                height: '80%',
                 lineWidth: 2,
                 resize: {
                     enabled: true
@@ -97,8 +119,8 @@ export default class Chart extends Component {
                 title: {
                     text: 'Volume'
                 },
-                top: '65%',
-                height: '35%',
+                top: '83%',
+                height: '17%',
                 offset: 0,
                 lineWidth: 2
             }],
@@ -111,9 +133,7 @@ export default class Chart extends Component {
             }
         }
 
-        return (
-            <ReactHighstock config={options}/>
-        );
+        return <ReactHighstock config={options} ref="chart"/>
     }
 }
 
