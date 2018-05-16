@@ -2,11 +2,7 @@ import React, {Component} from 'react';
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import PropTypes from "prop-types"
 import {Meteor} from "meteor/meteor";
-import DarkUnica from 'highcharts/themes/dark-unica'
 
-DarkUnica(ReactHighstock.Highcharts)
-
-// App component - represents the whole app
 export default class Chart extends Component {
     constructor(props) {
         super(props);
@@ -14,7 +10,7 @@ export default class Chart extends Component {
     }
 
     componentDidMount() {
-        this.getData("BTCUSD", "1h")
+        this.getData(this.props.symbol, "1h")
     }
 
     getData(symbol, timeFrame, selected = this.state.selected) {
@@ -25,10 +21,11 @@ export default class Chart extends Component {
     }
 
     render() {
+        const symbol = this.props.symbol
         const options = {
             series: [{
                 type: 'candlestick',
-                name: 'BTCUSD',
+                name: symbol,
                 data: this.state.candles
             }, {
                 type: 'column',
@@ -45,7 +42,7 @@ export default class Chart extends Component {
                     text: '1m',
                     events: {
                         click: () => {
-                            this.getData("BTCUSD", "1m", 0)
+                            this.getData(symbol, "1m", 0)
                         }
                     }
                 }, {
@@ -54,7 +51,7 @@ export default class Chart extends Component {
                     text: '5m',
                     events: {
                         click: () => {
-                            this.getData("BTCUSD", "5m", 1)
+                            this.getData(symbol, "5m", 1)
                         }
                     }
                 }, {
@@ -63,7 +60,7 @@ export default class Chart extends Component {
                     text: '30m',
                     events: {
                         click: () => {
-                            this.getData("BTCUSD", "30m", 2)
+                            this.getData(symbol, "30m", 2)
                         }
                     }
                 }, {
@@ -72,7 +69,7 @@ export default class Chart extends Component {
                     text: '1h',
                     events: {
                         click: () => {
-                            this.getData("BTCUSD", "1h", 3)
+                            this.getData(symbol, "1h", 3)
                         }
                     }
                 }, {
@@ -81,7 +78,7 @@ export default class Chart extends Component {
                     text: '6h',
                     events: {
                         click: () => {
-                            this.getData("BTCUSD", "6h", 4)
+                            this.getData(symbol, "6h", 4)
                         }
                     }
                 }, {
@@ -90,13 +87,13 @@ export default class Chart extends Component {
                     text: '1d',
                     events: {
                         click: () => {
-                            this.getData("BTCUSD", "1D", 5)
+                            this.getData(symbol, "1D", 5)
                         }
                     }
                 }]
             },
             title: {
-                text: 'BTCUSD'
+                text: symbol
             },
             yAxis: [{
                 labels: {
@@ -139,5 +136,6 @@ export default class Chart extends Component {
 
 Chart.propTypes = {
     width: PropTypes.number,
-    height: PropTypes.number
+    height: PropTypes.number,
+    symbol: PropTypes.string.isRequired
 }

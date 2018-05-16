@@ -1,1 +1,1 @@
-import '../imports/api/Bitfinex'
+import '/imports/startup/server'
