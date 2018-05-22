@@ -11,6 +11,11 @@ export default class Chart extends Component {
 
     componentDidMount() {
         this.getData(this.props.symbol, "1h")
+        ReactHighstock.Highcharts.setOptions({
+            time: {
+                timezoneOffset: new Date().getTimezoneOffset()
+            }
+        })
     }
 
     getData(symbol, timeFrame, selected = this.state.selected) {
