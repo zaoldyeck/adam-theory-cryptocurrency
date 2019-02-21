@@ -14,6 +14,11 @@ export default class Chart extends Component {
         ReactHighstock.Highcharts.setOptions({
             time: {
                 timezoneOffset: new Date().getTimezoneOffset()
+            },
+            chart: {
+                style: {
+                    fontFamily: "Trebuchet MS, Arial, sans-serif" // TradingView use "Trebuchet MS, Arial, sans-serif"
+                }
             }
         })
     }
