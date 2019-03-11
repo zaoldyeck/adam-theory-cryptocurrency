@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: adam-theory-cryptocurrency
+  annotations:
+      kubernetes.io/ingress.global-static-ip-name: stock-value-investor
+spec:
+  backend:
+    serviceName: adam-theory-cryptocurrency
+    servicePort: 3000
+  rules:
+  - host: investing.nctu.me
+    http:
+      paths:
+      - backend:
+          serviceName: adam-theory-cryptocurrency
+          servicePort: 3000
