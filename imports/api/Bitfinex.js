@@ -32,20 +32,22 @@ Meteor.methods({
     }
 });
 
-function getCandles(symbol, timeFrame) {
-    return axios.get(`https://api.bitfinex.com/v2/candles/trade:${timeFrame}:t${symbol.toUpperCase()}/hist`, {params: {limit: 1000}}).then(response => {
-        const candles = response.data.reverse()
+function getCandles(symbol, timeFrame, retry = 1) {
+    if (retry < 6) {
+        return axios.get(`https://api-pub.bitfinex.com/v2/candles/trade:${timeFrame}:t${symbol.toUpperCase()}/hist`, {params: {limit: 1000}}).then(response => {
+            const candles = response.data.reverse()
 
-        /**
-         * [MTS, OPEN, CLOSE, HIGH, LOW, VOLUME] to
-         * [MTS, OPEN, HIGH, LOW, CLOSE] and
-         * [MTS, VOLUME]
-         */
-        return {
-            candles: candles.map(candle => [candle[0], candle[1], candle[3], candle[4], candle[2]]),
-            volumes: candles.map(candle => {
-                return {x: candle[0], y: candle[5], color: candle[1] - candle[2] > 0 ? "#532834" : "#274841"}
-            }),
-        }
-    })
+            /**
+             * [MTS, OPEN, CLOSE, HIGH, LOW, VOLUME] to
+             * [MTS, OPEN, HIGH, LOW, CLOSE] and
+             * [MTS, VOLUME]
+             */
+            return {
+                candles: candles.map(candle => [candle[0], candle[1], candle[3], candle[4], candle[2]]),
+                volumes: candles.map(candle => {
+                    return {x: candle[0], y: candle[5], color: candle[1] - candle[2] > 0 ? "#532834" : "#274841"}
+                }),
+            }
+        }).catch(error => getCandles(symbol, timeFrame, retry + 1))
+    } else Meteor.Error("API retry limit", "Bitfinex API retry more than 5 times.")
 }
